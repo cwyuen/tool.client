@@ -3,10 +3,15 @@ package com.primecredit.tool.client.services;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -20,8 +25,11 @@ import com.primecredit.tool.client.config.SystemConfig;
 import com.primecredit.tool.common.domain.DiarizationSpeech;
 import com.primecredit.tool.common.parameter.ApplicationConfig;
 import com.primecredit.tool.common.util.FileUtil;
+import com.primecredit.tool.common.util.HostNameUtil;
 import com.primecredit.tool.common.util.WavFileHandler;
+import com.primecredit.tool.common.wsobject.request.RecongnitionRequest;
 import com.primecredit.tool.common.wsobject.request.TestRequest;
+import com.primecredit.tool.common.wsobject.response.RecognitionResponse;
 import com.primecredit.tool.common.wsobject.response.TestResponse;
 
 @Service
@@ -37,6 +45,9 @@ public class SpeechToTextService {
 
 	@Autowired
 	private SpeechRecongnitionService speechRecongnitionService;
+	
+	@Autowired
+	private SpeechStatisticsService speechStatisticsService;
 
 	public void run() throws Exception {
 		// (0) init var
@@ -80,26 +91,25 @@ public class SpeechToTextService {
 				List<String> speechTextList = speechRecongnitionService.convert(ds.getSourceFileName());
 				ds.setSpeechTextList(speechTextList);
 			}
-			
 
-			//(99) Export to file Result
+			// (99) Export to file Result
 			int index = sourceFileName.indexOf(".");
 			String filefirstName = sourceFileName.substring(0, index);
-			//String ext = sourceFileName.substring(index);
+			// String ext = sourceFileName.substring(index);
 			File textFile = new File(filefirstName + ".txt");
-			
+
 			try (FileWriter fw = new FileWriter(textFile); BufferedWriter bw = new BufferedWriter(fw)) {
-				
-				for(int version = 1; version<=5; version++) {
+
+				for (int version = 1; version <= 5; version++) {
 					bw.write("Version (" + version + ")");
 					bw.write("\n");
-					for(DiarizationSpeech ds: dsList) {
-						
-						bw.write(ds.getName() + " : " + ds.getSpeechTextList().get(version-1));
+					for (DiarizationSpeech ds : dsList) {
+
+						bw.write(ds.getName() + " : " + ds.getSpeechTextList().get(version - 1));
 						bw.write("\n");
 
 					}
-					
+
 					bw.write("==============================================");
 					bw.write("\n");
 					bw.write("\n");
@@ -107,43 +117,42 @@ public class SpeechToTextService {
 				bw.close();
 				fw.close();
 			}
-			
-			
+
+		}
+
+	}
+
+	public void speechStatistics() {
+		List<String> txtFiles = FileUtil.listFiles(systemConfig.getWavPath(), "txt");
+		
+		Iterator<String> fileIter = txtFiles.iterator();
+		while (fileIter.hasNext()) {
+			String textFileName = fileIter.next();
+			speechStatisticsService.statistics(textFileName);
 		}
 		
 	}
-
+	
+	
 	public void test() {
-		String urlStr = ApplicationConfig.getSpeakerIdentificationDiarizationServiceUrl();
-		System.out.println(urlStr);
-
+		String urlStr = ApplicationConfig.getSpeechRecognitionConvertServiceUrl();
+		String sourceFileName = "/Users/maxwellyuen/Documents/samples/__2001214488_2001214476_d488f28966ec39d528f999c2.wav";
+		Path path = Paths.get(sourceFileName);
+		byte[] data = null;
 		try {
-			URI uri = new URL(urlStr).toURI();
-			TestRequest tr = new TestRequest();
-			tr.setName("Test 001");
-			tr.getValues().add("001");
-			tr.getValues().add("002");
-			tr.getValues().add("003");
-			tr.getValues().add("004");
-
-			RestTemplate restTemplate = new RestTemplate();
-			// restTemplate.getMessageConverters().add(new
-			// MappingJacksonHttpMessageConverter());
-			// restTemplate.getMessageConverters().add(new StringHttpMessageConverter());
-			TestResponse testResponse = restTemplate.postForObject(uri, tr, TestResponse.class);
-
-			System.out.println(testResponse.getName());
-			for (String val : testResponse.getValues()) {
-				System.out.println(val);
-			}
-
-		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (URISyntaxException e) {
+			data = Files.readAllBytes(path);
+		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+
+		RecongnitionRequest request = new RecongnitionRequest();
+		request.setClientMachineId(HostNameUtil.getMachineHostName());
+		request.setMillisecond(new Date().getTime());
+		request.setFileData(data);
+
+		RestTemplate restTemplate = new RestTemplate();
+		RecognitionResponse response = restTemplate.postForObject(urlStr, request, RecognitionResponse.class);
 
 	}
 }

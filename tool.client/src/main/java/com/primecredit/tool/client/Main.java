@@ -19,7 +19,9 @@ public class Main {
 		
 		SpeechToTextService speechToTextService = context.getBean(SpeechToTextService.class);
 		try {
-			speechToTextService.run();
+			//speechToTextService.run();
+			speechToTextService.speechStatistics();
+			//speechToTextService.test();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
