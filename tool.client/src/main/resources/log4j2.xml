@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration>
 	<Properties>
-		<!-- 
 		<Property name="log-path">D:/logs</Property>
-		 -->
-		<Property name="log-path">/Users/maxwellyuen/Documents/logs</Property>
+		 
+		<!-- Property name="log-path">/Users/maxwellyuen/Documents/logs</Property-->
 		<Property name="app_name">client</Property>
 	</Properties>
 	<Appenders>

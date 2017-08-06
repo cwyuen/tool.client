@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import com.primecredit.tool.common.parameter.ApplicationConfig;
-import com.primecredit.tool.common.util.HostNameUtil;
+import com.primecredit.tool.common.util.HostNameUtils;
 import com.primecredit.tool.common.wsobject.request.SpeechStatisticsRequest;
 import com.primecredit.tool.common.wsobject.response.SpeechStatisticsResponse;
 
@@ -24,11 +24,11 @@ public class SpeechStatisticsService {
 
 	private static Logger logger = LoggerFactory.getLogger(SpeechStatisticsService.class);
 	
-	public void statistics(String sourceFileName) {
+	public boolean statistics(String sourceFileName) {
 		
 		List<String> speechTexts = extractFileContent(sourceFileName);
 		SpeechStatisticsRequest request = new SpeechStatisticsRequest();
-		request.setClientMachineId(HostNameUtil.getMachineHostName());
+		request.setClientMachineId(HostNameUtils.getMachineHostName());
 		request.setMillisecond(new Date().getTime());
 		request.setSpeechTexts(speechTexts);
 		request.setSourceFileName(sourceFileName);
@@ -38,8 +38,7 @@ public class SpeechStatisticsService {
 		RestTemplate restTemplate = new RestTemplate();
 		SpeechStatisticsResponse response = restTemplate.postForObject(urlStr, request, SpeechStatisticsResponse.class);
 		
-		logger.info(response.getReturnCode());
-		
+		return response.isSuccess();
 	}
 	
 	private List<String> extractFileContent(String sourceFileName){

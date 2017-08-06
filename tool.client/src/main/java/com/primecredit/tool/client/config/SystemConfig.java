@@ -7,8 +7,8 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 
 @Component
-// @PropertySource("classpath:config_windows.properties")
-@PropertySource("classpath:config_macos.properties")
+@PropertySource("classpath:config_windows.properties")
+//@PropertySource("classpath:config_macos.properties")
 public class SystemConfig {
 	@Value("${system.debug}")
 	private String systemDebug;

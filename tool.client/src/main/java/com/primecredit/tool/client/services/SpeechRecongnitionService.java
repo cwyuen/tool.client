@@ -7,17 +7,21 @@ import java.nio.file.Paths;
 import java.util.Date;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import com.primecredit.tool.common.parameter.ApplicationConfig;
-import com.primecredit.tool.common.util.HostNameUtil;
+import com.primecredit.tool.common.util.HostNameUtils;
 import com.primecredit.tool.common.wsobject.request.RecongnitionRequest;
 import com.primecredit.tool.common.wsobject.response.RecognitionResponse;
 
 @Service
 public class SpeechRecongnitionService {
 
+	private static Logger logger = LoggerFactory.getLogger(SpeechRecongnitionService.class);
+	
 	public List<String> convert(String sourceFileName)  {
 
 		String urlStr = ApplicationConfig.getSpeechRecognitionConvertServiceUrl();
@@ -27,15 +31,14 @@ public class SpeechRecongnitionService {
 		try {
 			data = Files.readAllBytes(path);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("IOException - SpeechRecongnitionService.convert: " + e.getMessage());			
 		}
 		
 		RecongnitionRequest request = new RecongnitionRequest();
-		request.setClientMachineId(HostNameUtil.getMachineHostName());
+		request.setClientMachineId(HostNameUtils.getMachineHostName());
 		request.setMillisecond(new Date().getTime());
 		request.setFileData(data);
-		
+		logger.info("Call SpeechRecognitionConvertService: " + sourceFileName);
 		RestTemplate restTemplate = new RestTemplate();
 		RecognitionResponse response = restTemplate.postForObject(urlStr, request, RecognitionResponse.class);
 

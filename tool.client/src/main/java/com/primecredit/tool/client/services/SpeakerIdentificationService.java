@@ -13,7 +13,7 @@ import org.springframework.web.client.RestTemplate;
 
 import com.primecredit.tool.common.domain.DiarizationSpeech;
 import com.primecredit.tool.common.parameter.ApplicationConfig;
-import com.primecredit.tool.common.util.HostNameUtil;
+import com.primecredit.tool.common.util.HostNameUtils;
 import com.primecredit.tool.common.wsobject.request.DiarizationRequest;
 import com.primecredit.tool.common.wsobject.response.DiarizationResponse;
 
@@ -27,12 +27,13 @@ public class SpeakerIdentificationService {
 
 		String urlStr = ApplicationConfig.getSpeakerIdentificationDiarizationServiceUrl();
 		//URI uri = new URL(urlStr).toURI();
-		
+		logger.info("diarization source: " + sourceFileName);
 		Path path = Paths.get(sourceFileName);
+		
 		byte[] data = Files.readAllBytes(path);
 		
 		DiarizationRequest request = new DiarizationRequest();
-		request.setClientMachineId(HostNameUtil.getMachineHostName());
+		request.setClientMachineId(HostNameUtils.getMachineHostName());
 		request.setMillisecond(new Date().getTime());
 		request.setFileData(data);
 		

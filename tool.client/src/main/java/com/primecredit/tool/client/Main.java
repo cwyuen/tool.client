@@ -19,14 +19,11 @@ public class Main {
 		
 		SpeechToTextService speechToTextService = context.getBean(SpeechToTextService.class);
 		try {
-			//speechToTextService.run();
-			speechToTextService.speechStatistics();
-			//speechToTextService.test();
+			speechToTextService.run();
+			//speechToTextService.speechStatistics();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("Exception - Main.main: " + e.getMessage());
 		}
 		
-		//System.exit(0);
 	}
 }
