@@ -32,6 +32,9 @@ public class SpeechToTextService {
 	
 	@Autowired
 	private SpeechStatisticsService speechStatisticsService;
+	
+	@Autowired
+	private NaturalLanguageService naturalLanguageService;
 
 	public void run() throws Exception {
 		// (0) init var
@@ -44,7 +47,19 @@ public class SpeechToTextService {
 		List<String> wavFiles = wavFileHandler.listWavFiles(systemConfig.getWavPath());
 
 		Iterator<String> wavIter = wavFiles.iterator();
+		
+		int idx = 0;
 		while (wavIter.hasNext()) {
+			
+			
+			if(systemConfig.isDebugMode()) {
+				
+				idx++;
+				if(idx > 5) {
+					break;
+				}
+			}
+			
 			String sourceFileName = wavIter.next();
 			
 			logger.info("File Name: {}", sourceFileName);
@@ -55,6 +70,8 @@ public class SpeechToTextService {
 			
 			// (3) Speaker Diarization
 			List<DiarizationSpeech> dsList = speakerIdentificationService.diarization(sourceFileName);
+			
+		
 
 			// (4) Split Wav file by speaker
 			if (dsList != null) {
@@ -95,8 +112,6 @@ public class SpeechToTextService {
 
 					}
 
-					bw.write("==============================================");
-					bw.write("\n");
 					bw.write("\n");
 				}
 				bw.close();
@@ -113,7 +128,8 @@ public class SpeechToTextService {
 		Iterator<String> fileIter = txtFiles.iterator();
 		while (fileIter.hasNext()) {
 			String textFileName = fileIter.next();
-			speechStatisticsService.statistics(textFileName);
+			//speechStatisticsService.statistics(textFileName);
+			naturalLanguageService.analyzeEntities(textFileName);
 		}
 		
 	}
