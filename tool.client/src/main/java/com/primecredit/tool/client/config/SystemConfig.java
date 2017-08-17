@@ -30,6 +30,9 @@ public class SystemConfig {
 
 	@Value("${speech.service")
 	private String speechService;
+	
+	@Value("${done.path}")
+	private String donePath;
 
 	public String getDictionaryFolder() {
 		return dictionaryFolder;
@@ -108,6 +111,14 @@ public class SystemConfig {
 			return true;
 		}
 		return false;
+	}
+
+	public String getDonePath() {
+		return donePath;
+	}
+
+	public void setDonePath(String donePath) {
+		this.donePath = donePath;
 	}
 
 }
