@@ -28,12 +28,14 @@ public class SpeechStatisticsService {
 		
 		List<String> speechTexts = extractFileContent(sourceFileName);
 		SpeechStatisticsRequest request = new SpeechStatisticsRequest();
+		
+		
 		request.setClientMachineId(HostNameUtils.getMachineHostName());
 		request.setMillisecond(new Date().getTime());
 		request.setSpeechTexts(speechTexts);
 		request.setSourceFileName(sourceFileName);
 		
-		String urlStr = ApplicationConfig.getSpeechStatisticsServiceUrl();
+		String urlStr = "";
 
 		RestTemplate restTemplate = new RestTemplate();
 		SpeechStatisticsResponse response = restTemplate.postForObject(urlStr, request, SpeechStatisticsResponse.class);

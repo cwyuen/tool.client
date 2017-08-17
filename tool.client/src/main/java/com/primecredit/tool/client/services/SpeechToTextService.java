@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import com.primecredit.tool.client.config.SystemConfig;
 import com.primecredit.tool.common.domain.DiarizationSpeech;
+import com.primecredit.tool.common.domain.NaturaLangEntry;
 import com.primecredit.tool.common.util.FileUtils;
 import com.primecredit.tool.common.util.WavFileHandler;
 
@@ -35,6 +36,9 @@ public class SpeechToTextService {
 	
 	@Autowired
 	private NaturalLanguageService naturalLanguageService;
+	
+	@Autowired
+	private TextReportService textReportService;
 
 	public void run() throws Exception {
 		// (0) init var
@@ -95,28 +99,7 @@ public class SpeechToTextService {
 			}
 
 			// (99) Export to file Result
-			int index = sourceFileName.indexOf(".");
-			String filefirstName = sourceFileName.substring(0, index);
-			// String ext = sourceFileName.substring(index);
-			File textFile = new File(filefirstName + ".txt");
-
-			try (FileWriter fw = new FileWriter(textFile); BufferedWriter bw = new BufferedWriter(fw)) {
-
-				for (int version = 1; version <= 20; version++) {
-					bw.write("Version (" + version + ")");
-					bw.write("\n");
-					for (DiarizationSpeech ds : dsList) {
-
-						bw.write(ds.getName() + " : " + ds.getSpeechTextList().get(version - 1));
-						bw.write("\n");
-
-					}
-
-					bw.write("\n");
-				}
-				bw.close();
-				fw.close();
-			}
+			textReportService.exportSpeech2TextReport(sourceFileName, dsList);
 
 		}
 
@@ -129,7 +112,11 @@ public class SpeechToTextService {
 		while (fileIter.hasNext()) {
 			String textFileName = fileIter.next();
 			//speechStatisticsService.statistics(textFileName);
-			naturalLanguageService.analyzeEntities(textFileName);
+			List<NaturaLangEntry> entites = naturalLanguageService.analyzeEntities(textFileName);
+			
+			for(NaturaLangEntry ne : entites) {
+				
+			}
 		}
 		
 	}
