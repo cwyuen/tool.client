@@ -42,7 +42,7 @@ public class SpeechToTextService {
 	
 	@Autowired
 	private FrequencyWordService frequencyWordService;
-
+	
 	@Autowired
 	private TextReportService textReportService;
 
@@ -174,6 +174,7 @@ public class SpeechToTextService {
 			// (99) Export to file Result
 			textReportService.exportSpeech2TextReport(sourceFileName, dsList);
 
+
 		}
 
 	}
@@ -242,9 +243,28 @@ public class SpeechToTextService {
 			logger.error(e.getMessage());
 		} catch (IOException e) {
 			logger.error(e.getMessage());
+
+		}
+		return results;
+
+	}
+
+	public void speechStatistics() {
+		List<String> txtFiles = FileUtils.listFiles(systemConfig.getWavPath(), "txt");
+		
+		Iterator<String> fileIter = txtFiles.iterator();
+		while (fileIter.hasNext()) {
+			String textFileName = fileIter.next();
+			//speechStatisticsService.statistics(textFileName);
+			List<NaturaLangEntry> entites = naturalLanguageService.analyzeEntities(textFileName);
+			
+			for(NaturaLangEntry ne : entites) {
+				
+			}
+
 		}
 		
-		return results;
+	
 	}
 
 	
